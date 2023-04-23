@@ -9,4 +9,5 @@ solana config set -u devnet|testnet|mainnet-beta
 cargo build-bpf
 
 client:
-    npm run start```
+    npm run start
+```
