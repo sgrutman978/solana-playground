@@ -1,4 +1,4 @@
-solana-keygen recover --force
+```solana-keygen recover --force
 solana airdrop 2
 solana-keygen new --force  
 solana balance
@@ -8,6 +8,5 @@ solana config set --url http://127.0.0.1:8899
 solana config set -u devnet|testnet|mainnet-beta
 cargo build-bpf
 
-
 client:
-    npm run start
+    npm run start```
