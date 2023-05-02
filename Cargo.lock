@@ -1378,6 +1378,7 @@ version = "0.1.0"
 dependencies = [
  "borsh",
  "borsh-derive 0.10.3",
+ "byteorder",
  "solana-program",
  "solana-program-test",
  "solana-sdk",

@@ -60,10 +60,14 @@ const PROGRAM_KEYPAIR_PATH = path.join(PROGRAM_PATH, 'hello_world-keypair.json')
  * The state of a greeting account managed by the hello world program
  */
 class GreetingAccount {
-  counter = 0;
-  constructor(fields: {counter: number} | undefined = undefined) {
+  highscore = 0;
+  games = 0;
+  score_sent = 0;
+  constructor(fields: {highscore: number, games: number, score_sent: number} | undefined = undefined) {
     if (fields) {
-      this.counter = fields.counter;
+      this.highscore = fields.highscore;
+      this.games = fields.games;
+      this.score_sent = fields.score_sent;
     }
   }
 }
@@ -72,7 +76,9 @@ class GreetingAccount {
  * Borsh schema definition for greeting accounts
  */
 const GreetingSchema = new Map([
-  [GreetingAccount, {kind: 'struct', fields: [['counter', 'u32']]}],
+  [GreetingAccount, {kind: 'struct', 
+  fields: [['highscore', 'u32'], ['games', 'u32'], ['score_sent', 'u32']]}],
+  // [GreetingAccount2, {kind: 'struct', fields: []}],
 ]);
 
 /**
@@ -168,6 +174,8 @@ export async function checkProgram(): Promise<void> {
     programId,
   );
 
+console.log(GREETING_SIZE);
+
   // Check if the greeting account has already been created
   const greetedAccount = await connection.getAccountInfo(greetedPubkey);
   if (greetedAccount === null) {
@@ -200,10 +208,21 @@ export async function checkProgram(): Promise<void> {
  */
 export async function sayHello(): Promise<void> {
   console.log('Saying hello to', greetedPubkey.toBase58());
+
+  
+  var buf = Buffer.alloc(16);
+  buf.writeUInt8(0x3, 0);
+  buf.writeUInt8(0x7, 4);
+  buf.writeUInt8(0x6, 8);
+  buf.writeUInt8(0x5, 12);
+  // var buf = Buffer.concat([buf, Buffer.from("abcd")])
+  console.log(buf);
+
+
   const instruction = new TransactionInstruction({
     keys: [{pubkey: greetedPubkey, isSigner: false, isWritable: true}],
     programId,
-    data: Buffer.alloc(0), // All instructions are hellos
+    data: buf, // All instructions are hellos
   });
   await sendAndConfirmTransaction(
     connection,
@@ -227,8 +246,13 @@ export async function reportGreetings(): Promise<void> {
   );
   console.log(
     greetedPubkey.toBase58(),
-    'has been greeted',
-    greeting.counter,
-    'time(s)',
+    'sent a score of ',
+    greeting.score_sent,
+    '. This account\'s highscore is ',
+    greeting.highscore,
+    '. This account has played ',
+    greeting.games,
+    'games.'//,
+    // greeting.greeting
   );
 }

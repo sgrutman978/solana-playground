@@ -1,4 +1,5 @@
-```solana-keygen recover --force
+```
+solana-keygen recover --force
 solana airdrop 2
 solana-keygen new --force  
 solana balance
@@ -10,4 +11,7 @@ cargo build-bpf
 
 client:
     npm run start
+
+other terminal for local dev:
+    solana-test-validator
 ```
