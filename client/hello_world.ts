@@ -210,19 +210,32 @@ export async function sayHello(): Promise<void> {
   console.log('Saying hello to', greetedPubkey.toBase58());
 
   
-  var buf = Buffer.alloc(16);
-  buf.writeUInt8(0x3, 0);
-  buf.writeUInt8(0x7, 4);
-  buf.writeUInt8(0x6, 8);
-  buf.writeUInt8(0x5, 12);
+  const mint = new GreetingAccount(
+    {
+      highscore: 6,
+      games: 2,
+      score_sent: 5
+    }
+  )
+
+  // var buf = Buffer.alloc(16);
+  // buf.writeUInt8(0x3, 0);
+  // buf.writeUInt8(0x7, 4);
+  // buf.writeUInt8(0x6, 8);
+  // buf.writeUInt8(0x5, 12);
   // var buf = Buffer.concat([buf, Buffer.from("abcd")])
-  console.log(buf);
+  // console.log(buf);
+
+
+  // Serialize the payload
+  const mintSerBuf = Buffer.from(borsh.serialize(GreetingSchema, mint));
+  console.log(mintSerBuf)
 
 
   const instruction = new TransactionInstruction({
     keys: [{pubkey: greetedPubkey, isSigner: false, isWritable: true}],
     programId,
-    data: buf, // All instructions are hellos
+    data: mintSerBuf, // All instructions are hellos
   });
   await sendAndConfirmTransaction(
     connection,
@@ -239,11 +252,13 @@ export async function reportGreetings(): Promise<void> {
   if (accountInfo === null) {
     throw 'Error: cannot find the greeted account';
   }
+  console.log(accountInfo.data);
   const greeting = borsh.deserialize(
     GreetingSchema,
     GreetingAccount,
     accountInfo.data,
   );
+  console.log(greeting);
   console.log(
     greetedPubkey.toBase58(),
     'sent a score of ',
@@ -252,7 +267,6 @@ export async function reportGreetings(): Promise<void> {
     greeting.highscore,
     '. This account has played ',
     greeting.games,
-    'games.'//,
-    // greeting.greeting
+    'games.'
   );
 }

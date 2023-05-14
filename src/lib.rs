@@ -7,7 +7,7 @@ use solana_program::{
     program_error::ProgramError,
     pubkey::Pubkey,
 };
-use std::str;
+// use std::str;
 
 // use byteorder::{BigEndian, ReadBytesExt};
 
@@ -17,8 +17,7 @@ pub struct GreetingAccount {
     /// number of greetings
     pub highscore: u32,
     pub games: u32,
-    pub score_sent: u32,
-    // pub greeting: String
+    pub score_sent: u32
 }
 
 // Declare and export the program's entrypoint
@@ -44,28 +43,42 @@ pub fn process_instruction(
         return Err(ProgramError::IncorrectProgramId);
     }
 
+
+
+    let payload = GreetingAccount::try_from_slice(&_instruction_data).unwrap();
+    msg!("Greetf {}", payload.name);
     // Increment and store the number of times the account has been greeted
     let mut greeting_account = GreetingAccount::try_from_slice(&account.data.borrow())?;
+    msg!("Greetf2 {}", payload.name);
     // let mut buf: &[u8] = _instruction_data;
     // let num = buf.read_u32::<BigEndian>().unwrap();
     
-    let num1 = u32::from_ne_bytes((*_instruction_data)[0..4].try_into().unwrap());
-    let num2 = u32::from_ne_bytes((*_instruction_data)[4..8].try_into().unwrap());
-    let num3 = u32::from_ne_bytes((*_instruction_data)[8..12].try_into().unwrap());
-    let num4 = u32::from_ne_bytes((*_instruction_data)[12..16].try_into().unwrap());
+    // let num1 = u32::from_ne_bytes((*_instruction_data)[0..4].try_into().unwrap());
+    // let num2 = u32::from_ne_bytes((*_instruction_data)[4..8].try_into().unwrap());
+    // let num3 = u32::from_ne_bytes((*_instruction_data)[8..12].try_into().unwrap());
+    // let num4 = u32::from_ne_bytes((*_instruction_data)[12..16].try_into().unwrap());
 
     // let txt = str::from_utf8(&_instruction_data[16..20]).unwrap().to_string();
     // greeting_account.greeting = "hellos".to_string();
     
-    let num_sum = num1 + num2 + num3 + num4;
-    greeting_account.score_sent = num_sum;
-    greeting_account.games += 1;
-    if num_sum > greeting_account.highscore {
-        greeting_account.highscore = num_sum;
-    }
+    // let num_sum = num1 + num2 + num3 + num4;
+    // greeting_account.score_sent = num_sum;
+    // greeting_account.games += 1;
+    // if num_sum > greeting_account.highscore {
+    //     greeting_account.highscore = num_sum;
+    // }
+
+    greeting_account.highscore = payload.highscore;
+    greeting_account.score_sent = payload.score_sent;
+    msg!("Greetf3 {}", greeting_account.name);
+    greeting_account.games = payload.games;
+    greeting_account.name = (*payload.name).to_string();
+    msg!("Greetf4 {}", payload.name);
+    msg!("Greetf6 {}", greeting_account.games);
+
     // greeting_account.highscore = num;
     greeting_account.serialize(&mut &mut account.data.borrow_mut()[..])?;
-
+    msg!("Greetf5 {}", payload.name);
     // msg!("Greeted {} time(s)!", greeting_account.highscore);
 
     Ok(())
